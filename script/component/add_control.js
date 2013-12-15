@@ -20,8 +20,8 @@
                 entity.dir = entity.dir.unit();
                 
             }
-            entity.vel.x += entity.dir.x * e.dt * 0.02;
-            entity.vel.y += entity.dir.y * e.dt * 0.02;
+            entity.vel.x += entity.dir.x * e.dt * 0.015;
+            entity.vel.y += entity.dir.y * e.dt * 0.015;
         });
 
     

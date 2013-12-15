@@ -5,7 +5,7 @@
         GrifGame.addEventCapabilities(this);
         this.active = false;
         this.name   = "menu";
-        this.menu   = new GrifGame.Menu(["play", "vote", "credits"], 480,420)
+        this.menu   = new GrifGame.Menu(["play", "vote", "credits", "audio: on"], 480,390,game)
         this.menu.on("play", function() {
             game.emit("sceneChange",{newScene:"gameplay"});
             game.emit("resetLevel");
@@ -16,12 +16,22 @@
         this.menu.on("credits", function() {
             window.location.replace("http://grifdail.fr/");
         });
+        this.menu.on("audio: on", function() {
+            this.option[3] = "audio: off";
+            this.timeout = 100;
+            Howler.mute()
+        });
+        this.menu.on("audio: off", function() {
+            this.option[3] = "audio: on";
+            this.timeout = 100;
+            Howler.unmute()
+        });
 
         var that = this
 
         game.on("sceneChange", function(e) {
             that.active = (e.newScene === that.name);
-            
+            that.menu.timeout = 100;
         });
 
         game.on("draw", function(e) {

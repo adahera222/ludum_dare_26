@@ -1,25 +1,30 @@
 (function() {
     "use strict";
 
-    function SceneGameOver(game) {
+    function ScenePause(game) {
         this.active = false;
-        this.name   = "gameover";
-        this.menu   = new GrifGame.Menu(["retry", "menu", "share on twitter", "share on facebook"], 480,350,game)
-        this.menu.on("retry", function() {
+        this.name   = "pause";
+        this.menu   = new GrifGame.Menu(["continue", "restart", "exit", "audio: on"], 480,350, game)
+        this.menu.on("restart", function() {
             game.emit("sceneChange",{newScene:"gameplay"});
             game.emit("resetLevel");
         });
         this.score = 0;
-        this.menu.on("menu", function(e) {
+        this.menu.on("exit", function(e) {
             game.emit("sceneChange",{newScene:"menu"});
         });
-        this.menu.on("share on twitter", function(e) {
-            var link = "http://twitter.com/home?status=I've%20scored%20"+that.score+"%20points%20on%20%22The%20Last%20Stand%22.%20http://grifdail.fr/Game/ludum_dare_28"
-            game.emit("sceneChange",{newScene:"share", link: link});
+        this.menu.on("continue", function() {
+            game.emit("sceneChange",{newScene:"gameplay"});
         });
-        this.menu.on("share on facebook", function(e) {
-            var link = "http://www.facebook.com/sharer/sharer.php?s=100&p[url]=http://grifdail.fr/Game/ludum_dare_28&p[images][0]=&p[title]=The%20Last%20Stand&p[summary]=I've%20scored%20"+that.score+"%20point%20on%20%22The%20Last%20Stand%22.%20"
-            game.emit("sceneChange",{newScene:"share", link: link});
+        this.menu.on("audio: on", function() {
+            this.option[3] = "audio: off";
+            this.timeout = 100;
+            Howler.mute()
+        });
+        this.menu.on("audio: off", function() {
+            this.option[3] = "audio: on";
+            this.timeout = 100;
+            Howler.unmute()
         });
         
 
@@ -39,7 +44,7 @@
                 e.ctx.fillRect(0,0,960,640)
                 that.menu.emit("draw", e);
                 e.ctx.font = "70pt Ubuntu, Arial, sans-serif";
-                e.ctx.fillText("Game Over",480,100);
+                e.ctx.fillText("Pause",480,100);
                  e.ctx.font = "50pt Ubuntu, Arial, sans-serif";
                 e.ctx.fillText("Score: "+that.score+"pts",480,200);
             }
@@ -57,13 +62,13 @@
     \*********************************************************/
     
     if (typeof exports === 'object') {
-        module.exports = SceneGameOver;
+        module.exports = ScenePause;
     } else if (typeof define === 'function') {
-        define(function() { return SceneGameOver; });
+        define(function() { return ScenePause  ; });
     } else if (typeof GrifGame === 'object') {
-        GrifGame.SceneGameOver = SceneGameOver;
+        GrifGame.ScenePause = ScenePause   ;
     } else {
-        this.SceneGameOver = SceneGameOver;
+        this.ScenePause = ScenePause   ;
     }
 }).call(function() {
     return this || (typeof window !== 'undefined' ? window : global);

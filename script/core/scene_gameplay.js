@@ -29,8 +29,12 @@
             that.shake = 500;
             that.life--;
             createEnemy()
+            
             if (that.life<=0) {
                 game.emit("sceneChange",{newScene:"gameover", score: that.score.value});
+                game.emit("playsound", {sound:"go"})
+            } else {
+                game.emit("playsound", {sound:"explode"})
             }
         });
 
@@ -46,6 +50,10 @@
                 }
                 that.shake -= e.dt;
             }
+        })
+
+        game.on("addEnemy", function() {
+            createEnemy()
         })
 
         function createEnemy() {
@@ -84,8 +92,13 @@
                 that.entities.forEachLiving(function(entity) {
                     entity.emit("update", e);
                 });
+                that.score.update(e);
+                var gamepad = e.inputs.gamepad(0);
+                if (e.inputs.key[27]|| (gamepad && gamepad.buttons[9])) {
+                    game.emit("sceneChange",{newScene:"pause", score: that.score.value});
+                }
             }
-            that.score.update(e);
+            
         });
     }
 

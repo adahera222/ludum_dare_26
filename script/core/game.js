@@ -5,6 +5,7 @@
         GrifGame.addEventCapabilities(this);
         this.loadCanvas();
         this.input = new GrifGame.InputManager();
+        this.sound = new GrifGame.SoundManager();
         this.load_scenes();
         this.frameIndex = 0;
         this.addSpecialEmiter("draw", function(callback, e) {
@@ -12,6 +13,13 @@
             this.emit("configureContext", e);
             callback();
             e.ctx.restore();
+        });
+
+        this.on("playsound", function(e) {
+            var sound = this.sound[e.sound];
+            if (sound) {
+                sound.play();
+            }
         });
     
     }
@@ -38,6 +46,7 @@
         this.scenes.menu = new GrifGame.SceneMenu(this);
         this.scenes.gameover = new GrifGame.SceneGameOver(this);
         this.scenes.share = new GrifGame.SceneShare(this);
+        this.scenes.share = new GrifGame.ScenePause(this);
     };
 
 
@@ -52,7 +61,7 @@
             var dt = timestamp-lastFrame;
             lastFrame = timestamp;
             var params = {
-                dt: dt,
+                dt: dt*0.95,
                 frameIndex: that.frameIndex,
                 inputs: that.input,
                 ctx: that.context,
@@ -63,10 +72,20 @@
             that.emit("draw", params);
         }
         GrifGame.readXML("data/entities.xml", function(file) {
-            //console.log(file)
+            that.sound.addToQueue("select","assets/s")
+            that.sound.addToQueue("c1","assets/c1")
+            that.sound.addToQueue("c2","assets/c2")
+            that.sound.addToQueue("c3","assets/c3")
+            that.sound.addToQueue("c4","assets/c4")
+            that.sound.addToQueue("explode","assets/e")
+            that.sound.addToQueue("bip","assets/b")
+            that.sound.addToQueue("go","assets/go")
+
             GrifGame.entitiesConfig = file;
-            mainloop(Date.now());
-            that.emit("sceneChange", {newScene: scene});
+            that.sound.downloadSound(function () {
+                mainloop(Date.now());
+                that.emit("sceneChange", {newScene: scene});
+            });
         });
         
     };

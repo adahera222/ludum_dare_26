@@ -1,13 +1,17 @@
 (function() {
     "use strict";
 
-    function Menu(option,x,y) {
+    function Menu(option,x,y,game) {
         GrifGame.addEventCapabilities(this);
         this.option = option;
         this.index = 0;
         this.x = x;
         this.y = y;
         this.timeout = 100;
+        var that = this;
+        game.on("sceneChange", function() {
+            that.timeout = 100;
+        }, false, 100);
 
         this.on("update", function (e) {
             this.timeout -= e.dt;
@@ -26,13 +30,17 @@
             if (v) {
                 this.index += v;
                 this.timeout= 100;
+                game.emit("playsound", {sound:"bip"});
             }
             this.index+=this.option.length;
             this.index%=this.option.length;
             if (e.inputs.key[13] || e.inputs.key[13] || (gamepad && (gamepad.buttons[2] || gamepad.buttons[3]))) {
                 this.emit(this.option[this.index]);
+                this.timeout= 100;
+                game.emit("playsound", {sound:"select"});
             }
         });
+
         var alpha = 0
         this.on("draw", function(e) {
             e.ctx.textBaseline = "middle";
